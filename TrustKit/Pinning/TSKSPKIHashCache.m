@@ -266,8 +266,10 @@ static BOOL isProtectedDataAvailable(void)
         void (^updateCacheBlock)(void) = ^{
             
             if (isProtectedDataAvailable()) {
-                NSData *serializedSpkiCache = [NSKeyedArchiver archivedDataWithRootObject:weakSelf.spkiCache requiringSecureCoding:YES error:nil];
-                if ([serializedSpkiCache writeToURL:[weakSelf SPKICachePath] atomically:YES] == NO) {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return;
+                NSData *serializedSpkiCache = [NSKeyedArchiver archivedDataWithRootObject:strongSelf.spkiCache requiringSecureCoding:YES error:nil];
+                if ([serializedSpkiCache writeToURL:[strongSelf SPKICachePath] atomically:YES] == NO) {
                     NSAssert(false, @"Failed to write cache");
                     TSKLog(@"Could not persist SPKI cache to the filesystem");
                 }
